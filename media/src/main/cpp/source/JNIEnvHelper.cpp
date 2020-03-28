@@ -4,13 +4,15 @@
 
 #include "JNIEnvHelper.h"
 
-bool JNIEnvHelper::attachEnv(JNIEnv *env, int threaType) {
+JNIEnvHelper* JNIEnvHelper::helper = NULL;
+
+bool JNIEnvHelper::attachEnv(JNIEnv** env, int threaType) {
     if (threaType != 0) {
-        if (globalVm->AttachCurrentThread(&env, NULL) != JNI_OK) {
+        if (globalVm->AttachCurrentThread(env, NULL) != JNI_OK) {
             return false;
         }
     } else {
-        *env = *globalEnv;
+        *env = globalEnv;
     }
     return true;
 }

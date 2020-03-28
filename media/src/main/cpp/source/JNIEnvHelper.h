@@ -4,10 +4,13 @@
 
 #ifndef NDK_MEDIA_JNIENVHELPER_H
 #define NDK_MEDIA_JNIENVHELPER_H
-
+extern "C" {
 #include <jni.h>
+};
+#include <memory>
 class JNIEnvHelper {
 private:
+    static JNIEnvHelper* helper;
     JavaVM* globalVm = NULL;
     JNIEnv* globalEnv = NULL;
     JNIEnvHelper() {};
@@ -17,9 +20,7 @@ public:
 
     static JNIEnvHelper* get();
     void init(JavaVM* javaVm, JNIEnv *env);
-    bool attachEnv(JNIEnv* env, int threaType);
+    bool attachEnv(JNIEnv** env, int threaType);
     void detachEnv();
 };
-
-static JNIEnvHelper* helper = NULL;
 #endif //NDK_MEDIA_JNIENVHELPER_H

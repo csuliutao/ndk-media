@@ -3,11 +3,12 @@
 AudioPlayer::~AudioPlayer() {
 }
 
-void AudioPlayer::prepare(JNIEnv *env, jobject listener) {
-    if (JNIEnvHelper::get()->attachEnv(env, JNIEnvHelper::MAIN)) {
-        jclass clz = env->GetObjectClass(listener);
-        jmethodID m_id = env->GetMethodID(clz, "onSucess", "()V");
-        env->CallVoidMethod(listener, m_id);
+void AudioPlayer::prepare(jobject listener) {
+    JNIEnv* temp;
+    if (JNIEnvHelper::get()->attachEnv(&temp, JNIEnvHelper::MAIN)) {
+        jclass clz = temp->GetObjectClass(listener);
+        jmethodID m_id = temp->GetMethodID(clz, "onSucess", "()V");
+        temp->CallVoidMethod(listener, m_id);
     }
 }
 

@@ -1,49 +1,27 @@
-#include <jni.h>
+
 #include <string>
 #include "AudioPlayer.h"
 #include "Factory.h"
-#include <NativeLog.h>
+#include "NativeLog.h"
 
 extern "C" {
+#include <jni.h>
 #include <unistd.h>
 }
 /**
  * 默认情况下,ndk加载动态库，对应一个c/cpp文件，库名字即为文件名字；系统也会依据此查找JNI_OnLoad；或者相对签名的native方法（名字也要符合）
  * 1、被动态库主文件（假设库名相同的文件）引用的文件，才会正确识别头文件，否则爆红
- * 2、没有返回值，编译并不会报错
+ * 2、没有返回值，编译并不会报错；警惕
+ * 3、静态变量，要再类内部定义，在外部初始化（也可以在构造器中初始化）
+ * 4、如果想给向空的一级指针的指针赋值，那么传出参数必须为二级指针；
  */
 
-Factory<int> factory(10);
-pthread_t produce,consume;
-
-void *consumeP(void *data) {
-    int index = 1000;
-    sleep(20);
-    while (index > 0) {
-        sleep(1);
-        factory.consume();
-        index--;
-    }
-    pthread_exit(&consume);
-}
-
-void *produceP(void *data) {
-    int index = 1000;
-    while (index > 0) {
-        sleep(2);
-        factory.produce(4);
-        index--;
-    }
-    pthread_exit(&produce);
-}
 JNIEXPORT void JNICALL prepareAudio(JNIEnv *env, jobject obj, jlong optr, jobject listener) {
     AudioPlayer* player = (AudioPlayer* ) optr;
-    player->prepare(env, listener);
+    player->prepare(listener);
 }
 
 JNIEXPORT jlong JNICALL initAudio(JNIEnv *env, jobject obj) {
-    pthread_create(&produce, NULL, produceP, NULL);
-    pthread_create(&consume, NULL, consumeP, NULL);
     AudioPlayer player;
     return (jlong) &player;
 }

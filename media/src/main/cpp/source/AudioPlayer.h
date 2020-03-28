@@ -9,7 +9,7 @@ public:
 public:
     AudioPlayer();
     ~AudioPlayer();
-    void prepare(JNIEnv *env, jobject listener);
+    void prepare(jobject listener);
 };
 
 
