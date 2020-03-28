@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import csu.tliu.ndk.media.FfmpegAudioPlayer;
 import csu.tliu.ndk.media.OnPrepaerListener;
@@ -31,5 +32,9 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    public void clcikOther(View view) {
+        Toast.makeText(this, "you click me!", Toast.LENGTH_SHORT).show();
     }
 }

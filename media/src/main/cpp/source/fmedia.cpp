@@ -7,46 +7,45 @@
 extern "C" {
 #include <unistd.h>
 }
-// 默认情况下,ndk加载动态库，对应一个c/cpp文件，库名字即为文件名字；系统也会依据此查找JNI_OnLoad；或者相对签名的native方法（名字也要符合）
-// 被动态库主文件（假设库名相同的文件）引用的文件，才会正确识别头文件，否则爆红
+/**
+ * 默认情况下,ndk加载动态库，对应一个c/cpp文件，库名字即为文件名字；系统也会依据此查找JNI_OnLoad；或者相对签名的native方法（名字也要符合）
+ * 1、被动态库主文件（假设库名相同的文件）引用的文件，才会正确识别头文件，否则爆红
+ * 2、没有返回值，编译并不会报错
+ */
 
 Factory<int> factory(10);
 pthread_t produce,consume;
 
 void *consumeP(void *data) {
-    //sleep(20);
-    int index = 10000;
+    int index = 1000;
+    sleep(20);
     while (index > 0) {
+        sleep(1);
+        factory.consume();
         index--;
     }
-    while (true) {
-        index++;
-        //sleep(10);
-        //factory.consume();
-    }
+    pthread_exit(&consume);
 }
 
 void *produceP(void *data) {
-    while (true) {
-        int index = 100;
-        while (index > 0) {
-            index--;
-        }
-        //sleep(2);
-        //factory.produce(4);
+    int index = 1000;
+    while (index > 0) {
+        sleep(2);
+        factory.produce(4);
+        index--;
     }
+    pthread_exit(&produce);
 }
 JNIEXPORT void JNICALL prepareAudio(JNIEnv *env, jobject obj, jlong optr, jobject listener) {
-    /*AudioPlayer* player = (AudioPlayer* ) optr;
-    player->prepare(env, listener);*/
+    AudioPlayer* player = (AudioPlayer* ) optr;
+    player->prepare(env, listener);
 }
 
 JNIEXPORT jlong JNICALL initAudio(JNIEnv *env, jobject obj) {
     pthread_create(&produce, NULL, produceP, NULL);
     pthread_create(&consume, NULL, consumeP, NULL);
-    //sleep(100);
-    /*AudioPlayer player;
-    return (jlong) &player;*/
+    AudioPlayer player;
+    return (jlong) &player;
 }
 
 JNINativeMethod audioPlayer[] = {
